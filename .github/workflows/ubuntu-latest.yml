@@ -67,6 +67,8 @@ jobs:
     # DEPLOYMENT WORKFLOW
 
     - name: Package
+      env:
+        RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
       run: make package -j3
 
     # List all files in install tree
