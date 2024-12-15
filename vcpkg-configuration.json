@@ -7,9 +7,38 @@
   },
   "registries": [
     {
+      "kind": "filesystem",
+      "path": "share/vcpkg",
+      "baseline": "2024-11-27",
+      "packages": [
+        "curl",
+        "ghc-filesystem",
+        "glfw",
+        "glew",
+        "libarchive",
+        "libsamplerate",
+        "jansson",
+        "nanovg",
+        "nanosvg",
+        "openssl",
+        "pffft",
+        "rtaudio",
+        "rtmidi",
+        "speexdsp",
+        "tinyexpr",
+        "zstd"
+      ]
+    },
+    {
       "kind": "artifact",
       "location": "https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip",
       "name": "microsoft"
     }
+  ],
+  "overlay-ports": [
+    "share/vcpkg/ports"
+  ],
+  "overlay-triplets": [
+    "share/vcpkg/triplets"
   ]
 }
