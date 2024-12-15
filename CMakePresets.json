@@ -13,7 +13,6 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "installDir": "${sourceDir}/install",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "hidden": true,
       "warnings": {
         "dev": false,
@@ -35,10 +34,6 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": {
           "value": "TRUE",
           "type": "BOOL"
-        },
-        "CMAKE_TOOLCHAIN_FILE": {
-          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-          "type": "PATH"
         },
         "CMAKE_CONFIGURATION_TYPES": {
           "value": "Debug;Release",
