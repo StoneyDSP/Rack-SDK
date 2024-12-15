@@ -1,0 +1,122 @@
+name: windows
+
+on:
+  # Runs on all pushes
+  push:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# When pushing new commits, cancel any running builds on that branch
+concurrency:
+  group: windows-latest-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DISPLAY: :0
+  CMAKE_BUILD_PARALLEL_LEVEL: 3
+  CMAKE_INSTALL_PARALLEL_LEVEL: 3
+  BUILD_DIR: build
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SCCACHE_GHA_ENABLED: "true"
+  RACK_SDK_VERSION: 2.5.2
+  RACK_SDK_PLATFORM: "win-x64"
+  MSYSTEM: "MINGW64"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    # defaults:
+    #   run:
+    #     shell: msys2 {0}
+
+    steps:
+
+      # REQUIREMENTS
+
+    - name: Checkout StoneyVCV code
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Install winget
+      uses: Cyberboss/install-winget@v1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # https://vcvrack.com/manual/Building#Setting-up-your-development-environment
+    - name: Install VCVRack2Free
+      run: winget install VCVRack.VCVRack --disable-interactivity --accept-source-agreements
+
+    - name: Use MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >-
+          --needed
+          base-devel
+          git
+          curl
+          wget
+          make
+          tar
+          unzip
+          ccache
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-gdb
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-catch
+          mingw-w64-x86_64-ninja
+          autoconf
+          automake
+          libtool
+          mingw-w64-x86_64-jq
+          python
+          zstd
+          mingw-w64-x86_64-pkgconf
+          tree
+          ninja
+
+    - name: Fetch Rack SDK
+      shell: msys2 {0}
+      run: |
+        curl https://vcvrack.com/downloads/Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip -o ./dep/Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip
+        cd dep
+        unzip Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip
+        cd ..
+
+      # DEVELOPER WORKFLOW
+
+    - name: Configure
+      shell: msys2 {0}
+      env:
+        RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
+      run: >-
+        cmake
+        --preset x64-windows-release
+        --fresh
+
+    - name: Install
+      shell: msys2 {0}
+      run: >-
+        cmake
+        --install ${{ env.BUILD_DIR }}
+        --prefix ${PWD}/install
+        --strip
+        -j 3
+
+      # DEPLOYMENT WORKFLOW
+
+    - name: Package
+      shell: msys2 {0}
+      env:
+        RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
+      run: make package -j3
+
+    # List all files in install tree
+    - name: Tree
+      shell: msys2 {0}
+      run: |
+        cd install
+        tree
+        cd ..
