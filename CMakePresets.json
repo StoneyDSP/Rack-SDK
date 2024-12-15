@@ -70,7 +70,7 @@
       ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": {
-          "value": "DEBUG",
+          "value": "Debug",
           "type": "STRING"
         }
       }
@@ -83,7 +83,7 @@
       ],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": {
-          "value": "RELEASE",
+          "value": "Release",
           "type": "STRING"
         }
       }
