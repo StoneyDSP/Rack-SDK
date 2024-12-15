@@ -4,6 +4,13 @@ Unofficial CMake targets and API for [VCV Rack 2 SDK](https://vcvrack.com/manual
 
 Created by [StoneyDSP](https://github.com/StoneyDSP) (no affiliation with VCV Rack or its' creators).
 
+---
+[![windows](https://github.com/StoneyDSP/Rack-SDK/actions/workflows/windows-latest.yml/badge.svg)](https://github.com/StoneyDSP/Rack-SDK/actions/workflows/windows-latest.yml)
+[![macos](https://github.com/StoneyDSP/Rack-SDK/actions/workflows/macos-latest.yml/badge.svg)](https://github.com/StoneyDSP/Rack-SDK/actions/workflows/macos-latest.yml)
+[![ubuntu](https://github.com/StoneyDSP/Rack-SDK/actions/workflows/ubuntu-latest.yml/badge.svg)](https://github.com/StoneyDSP/Rack-SDK/actions/workflows/ubuntu-latest.yml)
+
+---
+
 - [What is this?](#what-is-this)
 - [How does this work?](#how-does-this-work)
 - [How can I use it?](#how-can-i-use-it)
@@ -55,6 +62,8 @@ endforeach()
 
 ...and that's it!
 
+See [StoneyVCV](https://github.com/StoneyDSP/StoneyVCV/blob/production/CMakeLists.txt) for a working example.
+
 ## How does this work?
 
 This CMake project expects that you have an unmodified copy of the correct Rack 2 SDK on your filesystem (for now...), and for the correct platform. The location of this Rack SDK copy is passed in to CMake when configuring the VCVRack project (`-DRACK_DIR="path/to/unzipped/Rack-SDK"`), and in return, CMake will generate three targets for linkage:
@@ -64,6 +73,8 @@ This CMake project expects that you have an unmodified copy of the correct Rack 
 - `unofficial-vcvrack::rack-sdk::lib` - the `libRack.{so,dylib,dll,dll.a}` library file
 
 All three targets are passed to CMake's "install" routine, which makes them relocatable within the context of the CMake buildsystem. This allows CMake to relocate and/or make copies of the SDK files, and do whatever it likes to do with them, without causing any breakages.
+
+See [StoneyVCV](https://github.com/StoneyDSP/StoneyVCV/blob/production/CMakeLists.txt) for a working example.
 
 ## How can I use it?
 
@@ -179,6 +190,8 @@ make package
 ```
 
 *Creates a local directory (`./install`) containing a distributable package, unarchived*
+
+The GitHub Workflows in this repository may be a useful reference, if any doubts.
 
 ### *NOTE*
 

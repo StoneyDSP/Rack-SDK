@@ -55,6 +55,8 @@ endforeach()
 
 ...and that's it!
 
+See [StoneyVCV](https://github.com/StoneyDSP/StoneyVCV/blob/production/CMakeLists.txt) for a working example.
+
 ## How does this work?
 
 This CMake project expects that you have an unmodified copy of the correct Rack 2 SDK on your filesystem (for now...), and for the correct platform. The location of this Rack SDK copy is passed in to CMake when configuring the VCVRack project (`-DRACK_DIR="path/to/unzipped/Rack-SDK"`), and in return, CMake will generate three targets for linkage:
@@ -64,6 +66,8 @@ This CMake project expects that you have an unmodified copy of the correct Rack 
 - `unofficial-vcvrack::rack-sdk::lib` - the `libRack.{so,dylib,dll,dll.a}` library file
 
 All three targets are passed to CMake's "install" routine, which makes them relocatable within the context of the CMake buildsystem. This allows CMake to relocate and/or make copies of the SDK files, and do whatever it likes to do with them, without causing any breakages.
+
+See [StoneyVCV](https://github.com/StoneyDSP/StoneyVCV/blob/production/CMakeLists.txt) for a working example.
 
 ## How can I use it?
 
@@ -95,6 +99,8 @@ cmake --install ./build --prefix ./install
 The above allows us to "acquire" the VCVRack SDK files as if it were a "package" dependency in another project (i.e., in a VCV Rack plugin project) via [vcpkg package manager for C and C++](https://github.com/microsoft/vcpkg).
 
 To facilitate the above, [a vcpkg portfile can simply download the SDK zip file, unzip it, and pass along the unzipped output directory as `RACK_DIR`](https://github.com/StoneyDSP/Rack-SDK/blob/production/share/vcpkg/ports/rack/2.5.2/portfile.cmake) when configuring this as a CMake package dependency...
+
+See [StoneyVCV](https://github.com/StoneyDSP/StoneyVCV/blob/production/CMakeLists.txt) for a working example.
 
 ## Additional Functionality
 
@@ -179,6 +185,8 @@ make package
 ```
 
 *Creates a local directory (`./install`) containing a distributable package, unarchived*
+
+The GitHub Workflows in this repository may be a useful reference, if any doubts.
 
 ### *NOTE*
 
