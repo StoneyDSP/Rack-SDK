@@ -24,6 +24,11 @@ if(NOT "${VERSION}" STREQUAL "${VCVRACK_RACKSDK_VERSION}")
     return()
 endif()
 
+if(VCPKG_TARGET_IS_MINGW)
+    # Rack-SDK uses the old C runtime...
+    set(VCPKG_POLICY_ALLOW_OBSOLETE_MSVCRT enabled)
+endif()
+
 vcpkg_check_linkage(
     ONLY_DYNAMIC_LIBRARY
 )

@@ -5,4 +5,6 @@ set(VCPKG_ENV_PASSTHROUGH PATH)
 
 set(VCPKG_CMAKE_SYSTEM_NAME MinGW)
 
+# Rack-SDK uses the old C runtime...
+set(VCPKG_POLICY_ALLOW_OBSOLETE_MSVCRT enabled)
 # set(VCPKG_POLICY_DLLS_WITHOUT_LIBS enabled)
