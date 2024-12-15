@@ -29,7 +29,8 @@
       },
       "cacheVariables": {
         "RACK_DIR": {
-          "value": "$env{RACK_DIR}"
+          "value": "$env{RACK_DIR}",
+          "type": "PATH"
         },
         "CMAKE_EXPORT_COMPILE_COMMANDS": {
           "value": "TRUE",
