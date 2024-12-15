@@ -1,0 +1,152 @@
+{
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.trimAutoWhitespace": true,
+  "editor.insertSpaces": true,
+  "editor.rulers": [
+    80,
+    160
+  ],
+  "makefile.configureOnOpen": false,
+  "cmake.cmakePath": "cmake",
+  "cmake.ctestPath": "ctest",
+  "cmake.cpackPath": "cpack",
+  // "cmake.languageSupport.enableFileAPI": true,
+  // "cmake.cmakeCommunicationMode": "fileApi",
+  "cmake.sourceDirectory": "${workspaceFolder}",
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.installPrefix": "${workspaceFolder}/install",
+  "cmake.exportCompileCommandsFile": true,
+  "cmake.loadCompileCommands": true,
+  "cmake.launchBehavior": "reuseTerminal",
+  "cmake.preferredGenerators": [
+    "Ninja",
+    "Ninja Multi-Config"
+  ],
+  "cmake.configureOnOpen": true,
+  "cmake.configureOnEdit": false,
+  "cmake.clearOutputBeforeBuild": true,
+  "cmake.saveBeforeBuild": true,
+  "cmake.buildBeforeRun": true,
+
+  "cmake.deleteBuildDirOnCleanConfigure": false,
+  "cmake.useVsDeveloperEnvironment": "auto",
+  "cmake.automaticReconfigure": true,
+  "cmake.skipConfigureIfCachePresent": true,
+  "cmake.useCMakePresets": "always",
+  "cmake.debugConfig": {
+		"cwd": "${workspaceFolder}",
+		"symbolSearchPath": "${workspaceFolder}/include",
+		"miDebuggerPath": "${workspaceFolder}/share/gdbinit",
+		"MIMode": "gdb",
+		"console": "newExternalWindow",
+		"stopAtEntry": false,
+		"logging": {
+			"engineLogging": false,
+			"exceptions": true,
+			"moduleLoad": true,
+			"trace": false,
+			"traceResponse": false,
+			"programOutput": true
+		}
+	},
+
+  "vcpkg.general.enable": false,
+  "C_Cpp.autoAddFileAssociations": true,
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/include"
+  ],
+  "C_Cpp.default.defines": [],
+  "C_Cpp.default.browse.databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+  "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": true,
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "C_Cpp.default.mergeConfigurations": true,
+  "C_Cpp.default.cStandard": "c11",
+  "C_Cpp.default.cppStandard": "c++11",
+  "C_Cpp.vcpkg.enabled": false,
+  "C_Cpp.files.exclude": {
+    "**/.github": true,
+    "**/.vscode": true,
+    "**/.vs": true,
+    "**/docs": true,
+    "**/share": true,
+    "**/install": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/bin": true
+  },
+  "json.format.enable": true,
+  "json.validate.enable": true,
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "**/vcpkg.json"
+      ],
+      "url": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json"
+    },
+    {
+      "fileMatch": [
+        "**/vcpkg-configuration.json"
+      ],
+      "url": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg-configuration.schema.json"
+    },
+    {
+      "fileMatch": [
+        "**/plugin.json"
+      ],
+      "url": "plugin.schema.json"
+    }
+  ],
+  "[json]": {
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.suggest.insertMode": "replace",
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.suggest.insertMode": "replace",
+    "editor.defaultFormatter": "vscode.json-language-features",
+  },
+  "[markdown]": {
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    },
+    "editor.defaultFormatter": "vscode.markdown-language-features"
+  },
+  "terminal.integrated.defaultProfile.windows": "MSYS2 MINGW64",
+  "terminal.integrated.profiles.windows": {
+    "MSYS2 MINGW64": {
+      "path": "cmd.exe",
+      "args": [
+        "/c",
+        "C:\\msys64\\msys2_shell.cmd -defterm -here -no-start -mingw64"
+      ]
+    },
+    "MSYS2 MSYS64": {
+      "path": "cmd.exe",
+      "args": [
+        "/c",
+        "C:\\msys64\\msys2_shell.cmd -defterm -here -no-start -msys2"
+      ]
+    }
+  },
+  "files.associations": {
+    "**/usage": "plaintext",
+    "**.bash**": "shellscript",
+    "**.cmake": "cmake",
+    ".editorconfig": "editorconfig",
+    "**.vcvm": "json",
+    "config.guess": "shellscript"
+  }
+}
