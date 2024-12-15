@@ -4,6 +4,10 @@
 # into three logical CMake targets: deps, sdk (headers), and lib (dynamic
 # library).
 
+# For this to be a vcpkg thing, we just need to use a vcpkg helper function
+# to download the SDK from the Rack website, unzip it, and then configure
+# the VCVRack CMake project with those contents...
+
 if(NOT VCPKG_TARGET_IS_MINGW AND NOT VCPKG_TARGET_IS_LINUX AND NOT VCPKG_TARGET_IS_OSX)
     message(SEND_ERROR "VCV Rack SDK does not support the current platform...")
     return()
@@ -19,28 +23,6 @@ if(NOT "${VERSION}" STREQUAL "${VCVRACK_RACKSDK_VERSION}")
     message(SEND_ERROR "VCV Rack SDK version mismatch: Requested version: ${VERSION}; found version: ${VCVRACK_RACKSDK_VERSION}...")
     return()
 endif()
-# For this to be a vcpkg thing, we just need to use a vcpkg helper function
-# to download the SDK from the Rack website, unzip it, and then configure
-# the VCVRack CMake project with those contents...
-
-function(_normalize_path var)
-    message(STATUS "normalizing path: ${var}")
-    set(path "${${var}}")
-    file(TO_CMAKE_PATH "${path}" path)
-
-    while(path MATCHES "//")
-        string(REPLACE "//" "/" path "${path}")
-    endwhile()
-
-    string(REGEX REPLACE "/+$" "" path "${path}")
-    set("${var}" "${path}" PARENT_SCOPE)
-    message(STATUS "normalized path: ${var}")
-endfunction()
-
-# A temporary dirty hack to find the CMakeLists.txt under 'dep/VCVRack'
-function(get_this_dir)
-    set(_this_dir "${CMAKE_CURRENT_FUNCTION_LIST_DIR}" PARENT_SCOPE)
-endfunction()
 
 vcpkg_check_linkage(
     ONLY_DYNAMIC_LIBRARY
@@ -96,10 +78,13 @@ vcpkg_extract_source_archive_ex(
     ARCHIVE "${ARCHIVE}"
 )
 
-# Dirty hack to use the local 'CMakeLists.txt' file under 'dep/VCVRack'...
-get_this_dir()
-get_filename_component(__stoneyvcv_dir "${_this_dir}/../../../../../" ABSOLUTE)
-set(SOURCE_PATH "${__stoneyvcv_dir}/dep/VCVRack/Rack-SDK")
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO StoneyDSP/Rack-SDK
+    REF 2f69977580e259dfdd0e730e41a1f32009a6812f
+    SHA512 c2168bac0acd177c18cfda142c923d2923d926d5131ffa0b5a4f99301b9a328688e29d9dbc1e4296346c99844f4f8716151f82d859ea3938b07928d80a4022dc
+    HEAD_REF main
+)
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
