@@ -384,6 +384,7 @@ set_target_properties(lib
     SOVERSION "${RACK_SDK_VERSION_MAJOR}"
 
     ENABLE_EXPORTS TRUE
+    EXPORT_NO_SYSTEM TRUE
 
     INTERFACE_COMPILE_FEATURES "cxx_std_11;c_std_11"
     INTERFACE_COMPILE_OPTIONS "-fPIC"
@@ -537,6 +538,7 @@ set_target_properties(unofficial-vcvrack::rack-sdk::lib PROPERTIES
     VERSION @RACK_SDK_VERSION_MAJOR@.@RACK_SDK_VERSION_MINOR@.@RACK_SDK_VERSION_PATCH@
     SOVERSION @RACK_SDK_VERSION_MAJOR@.@RACK_SDK_VERSION_MINOR@.@RACK_SDK_VERSION_PATCH@
     ENABLE_EXPORTS TRUE
+    EXPORT_NO_SYSTEM TRUE
     INTERFACE_COMPILE_FEATURES "cxx_std_11;c_std_11"
     INTERFACE_COMPILE_OPTIONS "-fPIC"
     INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
@@ -674,14 +676,14 @@ set(VCVRACK_DISABLE_USAGE_MESSAGE @VCVRACK_DISABLE_USAGE_MESSAGE@)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/Rack-SDK.pc.in" [==[
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}
-libdir=/${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=/${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: Rack-SDK
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 Libs: -L${libdir}
-Cflags: -I${includedir}
+Cflags: -I${includedir} -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack -fPIC
 ]==])
 
 # Configure pkgconfig file
