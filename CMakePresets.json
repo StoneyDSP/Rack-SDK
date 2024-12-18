@@ -32,6 +32,10 @@
           "value": "$env{RACK_DIR}",
           "type": "PATH"
         },
+        "CMAKE_INSTALL_PREFIX": {
+          "value": "${sourceDir}/install",
+          "type": "PATH"
+        },
         "CMAKE_EXPORT_COMPILE_COMMANDS": {
           "value": "TRUE",
           "type": "BOOL"
