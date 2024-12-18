@@ -93,9 +93,10 @@ vcpkg_from_github(
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
-        dep         RACK_SDK_BUILD_DEPS
-        core        RACK_SDK_BUILD_CORE
-        lib         RACK_SDK_BUILD_LIB
+        dep         RACK_SDK_INSTALL_DEPS
+        core        RACK_SDK_INSTALL_CORE
+        lib         RACK_SDK_INSTALL_LIB
+        runtimes    RACK_SDK_INSTALL_RUNTIME_LIBS
 )
 
 # Configure 'dep/VCVRack/CMakeLists.txt' using the unzipped Rack SDK
@@ -104,16 +105,12 @@ vcpkg_cmake_configure(
     OPTIONS
     -DRACK_DIR:PATH="${RACK_DIR}"
     -DVCVRACK_DISABLE_USAGE_MESSAGE:BOOL="TRUE"
-    # Expands to: "-DRACK_SDK_BUILD_DEPS=ON|OFF;-DRACK_SDK_BUILD_CORE=ON|OFF;-DRACK_SDK_BUILD_LIB=ON|OFF"
+    # Expands to: "-DRACK_SDK_BUILD_DEPS=ON|OFF;-DRACK_SDK_BUILD_CORE=ON|OFF;-DRACK_SDK_BUILD_LIB=ON|OFF;-DRACK_SDK_INSTALL_RUNTIME_LIBS=ON|OFF"
     ${FEATURE_OPTIONS}
 )
 vcpkg_cmake_install()
 vcpkg_fixup_pkgconfig()
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
-file(
-    INSTALL "${RACK_DIR}/helper.py"
-    DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
-)
 file(
     INSTALL "${SOURCE_PATH}/LICENSE"
     DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
@@ -121,7 +118,7 @@ file(
 )
 string(CONFIGURE [==[
 
-To build a plugin and modules with the VCV Rack API, you can:
+rack-sdk provides CMake targets:
 
 project(MyPlugin)
 
@@ -145,7 +142,9 @@ vcvrack_add_module(MyOtherModule
 
 You can #include '<rack.hpp>' in 'plugin.cpp' and start building with the VCV Rack API and all its' dependencies.
 
-For more examples: https://github.com/StoneyDSP/StoneyVCV/dep/VCVRack/share/cmake/Modules/README.md
+For more examples:
+
+https://github.com/StoneyDSP/Rack-SDK/share/cmake/Modules/README.md
 
 ]==] _VCVRACK_USAGE_FILE @ONLY)
 file(WRITE "${CURRENT_PACKAGES_DIR}/include/rack.hpp" [==[
