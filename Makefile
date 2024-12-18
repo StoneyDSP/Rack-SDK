@@ -27,7 +27,11 @@ endif
 ifdef BUILD_TYPE
 	PRESET_CONFIG := $(BUILD_TYPE)
 else
-	PRESET_CONFIG := release
+	ifdef DEBUG
+		PRESET_CONFIG := debug
+	else
+		PRESET_CONFIG := release
+	endif
 endif
 
 ifdef VERBOSE
@@ -62,3 +66,9 @@ package: test
 	cmake \
   --install $(PWD)/build \
 	--prefix $(PWD)/install
+
+workflow:
+	cmake \
+  --workflow \
+	--preset $(PRESET) \
+	--fresh
