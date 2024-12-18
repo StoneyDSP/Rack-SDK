@@ -22,9 +22,10 @@ include(CMakeDependentOption)
 
 option(VCVRACK_DISABLE_USAGE_MESSAGE "" OFF)
 
-option(RACK_SDK_BUILD_DEPS "" ON)
-cmake_dependent_option(RACK_SDK_BUILD_CORE "" ON "RACK_SDK_BUILD_DEPS" ON)
-cmake_dependent_option(RACK_SDK_BUILD_LIB "" ON "RACK_SDK_BUILD_CORE" ON)
+option(RACK_SDK_INSTALL_DEPS "" ON)
+cmake_dependent_option(RACK_SDK_INSTALL_CORE "" ON "RACK_SDK_INSTALL_DEPS" ON)
+cmake_dependent_option(RACK_SDK_INSTALL_LIB "" ON "RACK_SDK_INSTALL_CORE" ON)
+cmake_dependent_option(RACK_SDK_INSTALL_RUNTIME_LIBS "" OFF "RACK_SDK_INSTALL_LIB" ON)
 
 project(RACK_SDK
     VERSION ${RACK_VERSION}
@@ -41,7 +42,7 @@ endif()
 include(GNUInstallDirs)
 set(RACK_SDK_TARGETS)
 
-if(RACK_SDK_BUILD_DEPS)
+if(RACK_SDK_INSTALL_DEPS)
 #[==[Rack SDK Deps]==]
 add_library(dep INTERFACE)
 add_library(rack-sdk::dep ALIAS dep)
@@ -84,32 +85,38 @@ message(DEBUG "${__rack_dep_headers_glob}")
 
 # Let's make a FILE_SET which we can export
 foreach(__rack_dep_header IN LISTS __rack_dep_headers_glob)
+
     get_filename_component(abs_path_to_file "${__rack_dep_header}" ABSOLUTE)
     get_filename_component(name_of_file "${abs_path_to_file}" NAME)
     file(RELATIVE_PATH rel_path_to_file "${RACK_DIR}/dep/include" "${abs_path_to_file}") # dep/include/somedep/someheader.hpp
 
-    #
-    configure_file("${RACK_DIR}/dep/include/${rel_path_to_file}" "include/Rack-SDK/dep/${rel_path_to_file}")
+    configure_file(
+        "${RACK_DIR}/dep/include/${rel_path_to_file}"
+        "include/Rack-SDK/dep/${rel_path_to_file}"
+        @ONLY
+    )
+
     unset(abs_path_to_file)
     unset(name_of_file)
     unset(rel_path_to_file)
+
 endforeach()
 
 unset(__rack_dep_headers_glob)
 file(GLOB_RECURSE __rack_dep_headers_glob CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/Rack-SDK/dep/*.h*")
 
 foreach(__rack_dep_header IN LISTS __rack_dep_headers_glob)
+
     get_filename_component(abs_path_to_file "${__rack_dep_header}" ABSOLUTE)
     get_filename_component(name_of_file "${__rack_dep_header}" NAME)
-    file(
-        RELATIVE_PATH rel_path_to_file "${PROJECT_BINARY_DIR}" "${abs_path_to_file}"
-    )
+    file(RELATIVE_PATH rel_path_to_file "${PROJECT_BINARY_DIR}" "${abs_path_to_file}")
     get_filename_component(name_of_file_dir "${rel_path_to_file}" DIRECTORY)
+
     message(DEBUG "")
-    message(DEBUG "name_of_file: ${name_of_file}") # "someheader.hpp"
-    message(DEBUG "name_of_file_dir: ${name_of_file_dir}") # "include/Rack-SDK/dep/somedep"
-    message(DEBUG "abs_path_to_file: ${abs_path_to_file}") # "C:/..." or "/home/.../
-    message(DEBUG "rel_path_to_file: ${rel_path_to_file}") # "include/Rack-SDK/dep/somedep/someheader.hpp"
+    message(DEBUG "name_of_file: ${name_of_file}")          # "someheader.hpp"
+    message(DEBUG "name_of_file_dir: ${name_of_file_dir}")  # "include/Rack-SDK/dep/somedep"
+    message(DEBUG "abs_path_to_file: ${abs_path_to_file}")  # "C:/..." or "/home/.../
+    message(DEBUG "rel_path_to_file: ${rel_path_to_file}")  # "include/Rack-SDK/dep/somedep/someheader.hpp"
     message(DEBUG "")
 
     target_sources(dep INTERFACE
@@ -122,10 +129,12 @@ foreach(__rack_dep_header IN LISTS __rack_dep_headers_glob)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${rel_path_to_file}>
         $<INSTALL_INTERFACE:${rel_path_to_file}>
     )
+
     unset(abs_path_to_file)
     unset(name_of_file)
     unset(rel_path_to_file)
     unset(name_of_file_dir)
+
 endforeach()
 
 target_compile_options(dep
@@ -165,10 +174,10 @@ export(
 
 list(APPEND RACK_SDK_TARGETS dep)
 
-endif(RACK_SDK_BUILD_DEPS)
+endif(RACK_SDK_INSTALL_DEPS)
 
 
-if(RACK_SDK_BUILD_CORE)
+if(RACK_SDK_INSTALL_CORE)
 #[==[Rack SDK]==]
 add_library(core INTERFACE)
 add_library(rack-sdk::core ALIAS core)
@@ -211,11 +220,17 @@ message(DEBUG "${__rack_sdk_headers_glob}")
 
 # Let's make a FILE_SET which we can export
 foreach(__rack_sdk_header IN LISTS __rack_sdk_headers_glob)
+
     get_filename_component(abs_path_to_file "${__rack_sdk_header}" ABSOLUTE)
     get_filename_component(name_of_file "${abs_path_to_file}" NAME)
     file(RELATIVE_PATH rel_path_to_file "${RACK_DIR}/include" "${abs_path_to_file}")
 
-    configure_file("${RACK_DIR}/include/${rel_path_to_file}" "include/Rack-SDK/rack/${rel_path_to_file}")
+    configure_file(
+        "${RACK_DIR}/include/${rel_path_to_file}"
+        "include/Rack-SDK/rack/${rel_path_to_file}"
+        @ONLY
+    )
+
     unset(abs_path_to_file)
     unset(name_of_file)
     unset(rel_path_to_file)
@@ -226,17 +241,17 @@ unset(__rack_sdk_headers_glob)
 file(GLOB_RECURSE __rack_sdk_headers_glob CONFIGURE_DEPENDS "${PROJECT_BINARY_DIR}/include/Rack-SDK/rack/*.h*")
 
 foreach(__rack_sdk_header IN LISTS __rack_sdk_headers_glob)
+
     get_filename_component(abs_path_to_file "${__rack_sdk_header}" ABSOLUTE)
     get_filename_component(name_of_file "${__rack_dep_header}" NAME)
-    file(
-        RELATIVE_PATH rel_path_to_file "${PROJECT_BINARY_DIR}" "${abs_path_to_file}"
-    )
+    file(RELATIVE_PATH rel_path_to_file "${PROJECT_BINARY_DIR}" "${abs_path_to_file}")
     get_filename_component(name_of_file_dir "${rel_path_to_file}" DIRECTORY)
+
     message(DEBUG "")
-    message(DEBUG "name_of_file: ${name_of_file}") # "someheader.hpp"
-    message(DEBUG "name_of_file_dir: ${name_of_file_dir}") # "include/Rack-SDK/rack/someobject"
-    message(DEBUG "abs_path_to_file: ${abs_path_to_file}") # "C:/..." or "/home/.../
-    message(DEBUG "rel_path_to_file: ${rel_path_to_file}") # "include/Rack-SDK/rack/someobject/someheader.hpp"
+    message(DEBUG "name_of_file: ${name_of_file}")          # "someheader.hpp"
+    message(DEBUG "name_of_file_dir: ${name_of_file_dir}")  # "include/Rack-SDK/rack/someobject"
+    message(DEBUG "abs_path_to_file: ${abs_path_to_file}")  # "C:/..." or "/home/.../
+    message(DEBUG "rel_path_to_file: ${rel_path_to_file}")  # "include/Rack-SDK/rack/someobject/someheader.hpp"
     message(DEBUG "")
 
     target_sources(core INTERFACE
@@ -249,10 +264,12 @@ foreach(__rack_sdk_header IN LISTS __rack_sdk_headers_glob)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/${rel_path_to_file}>
         $<INSTALL_INTERFACE:${rel_path_to_file}>
     )
+
     unset(abs_path_to_file)
     unset(name_of_file)
     unset(rel_path_to_file)
     unset(name_of_file_dir)
+
 endforeach()
 
 target_compile_options(core
@@ -290,9 +307,18 @@ export(
 
 list(APPEND RACK_SDK_TARGETS core)
 
-## Intellisense helper...
+# ## Intellisense helper...
 # add_library(rack-sdk INTERFACE)
 # add_library(unofficial-vcvrack::rack-sdk ALIAS rack-sdk)
+# configure_file("${RACK_DIR}/helper.py"              "share/Rack-SDK/helper.py"          @ONLY)
+# configure_file("${RACK_DIR}/LICENSE-dist.html"      "share/Rack-SDK/LICENSE-dist.html"  @ONLY)
+# configure_file("${RACK_DIR}/LICENSE.html"           "share/Rack-SDK/LICENSE.html"       @ONLY)
+# configure_file("${RACK_DIR}/README.html"            "share/Rack-SDK/README.html"        @ONLY)
+# configure_file("${RACK_DIR}/CHANGELOG.html"         "share/Rack-SDK/CHANGELOG.html"     @ONLY)
+# configure_file("${RACK_DIR}/arch.mk"                "share/Rack-SDK/arch.mk"            @ONLY)
+# configure_file("${RACK_DIR}/compile.mk"             "share/Rack-SDK/compile.mk"         @ONLY)
+# configure_file("${RACK_DIR}/dep.mk"                 "share/Rack-SDK/dep.mk"             @ONLY)
+# configure_file("${RACK_DIR}/plugin.mk"              "share/Rack-SDK/plugin.mk"          @ONLY)
 # configure_file("include/rack.hpp" "include/rack.hpp")
 # target_sources(rack-sdk INTERFACE
 #     FILE_SET rack_sdk_INTERFACE_HEADERS
@@ -311,6 +337,22 @@ list(APPEND RACK_SDK_TARGETS core)
 # target_link_libraries(rack-sdk
 #     INTERFACE
 #         unofficial-vcvrack::rack-sdk::core
+# )
+
+# # Install misc. files
+# install(
+#     FILES
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/helper.py"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/LICENSE-dist.html"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/LICENSE.html"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/README.html"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/CHANGELOG.html"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/arch.mk"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/compile.mk"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/dep.mk"
+#         "${CMAKE_CURRENT_BINARY_DIR}/share/Rack-SDK/plugin.mk"
+#     DESTINATION
+#         "${CMAKE_INSTALL_DATADIR}/Rack-SDK"
 # )
 
 # # install the target and create export-set
@@ -337,9 +379,9 @@ list(APPEND RACK_SDK_TARGETS core)
 #     NAMESPACE unofficial-vcvrack::
 # )
 
-endif(RACK_SDK_BUILD_CORE)
+endif(RACK_SDK_INSTALL_CORE)
 
-if(RACK_SDK_BUILD_LIB)
+if(RACK_SDK_INSTALL_LIB)
 
 #[==[Rack Library]==]
 add_library(lib SHARED IMPORTED GLOBAL)
@@ -385,6 +427,7 @@ set_target_properties(lib
 
     ENABLE_EXPORTS TRUE
     EXPORT_NO_SYSTEM TRUE
+    IMPORTED_NO_SYSTEM TRUE
 
     INTERFACE_COMPILE_FEATURES "cxx_std_11;c_std_11"
     INTERFACE_COMPILE_OPTIONS "-fPIC"
@@ -439,12 +482,19 @@ install(
     COMPONENT lib
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    OPTIONAL
 )
 
-# install(RUNTIME_DEPENDENCY_SET LibExports
-# LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-# RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-# )
+if(RACK_SDK_INSTALL_RUNTIME_LIBS)
+    install(
+        RUNTIME_DEPENDENCY_SET LibExports
+        COMPONENT runtimes
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        EXCLUDE_FROM_ALL
+        OPTIONAL
+    )
+endif()
 
 # The below codeblob is a big multi-line string (not a comment!) which writes
 # information about the `lib` target to a file...
@@ -535,10 +585,11 @@ endif()
 add_library(unofficial-vcvrack::rack-sdk::lib SHARED IMPORTED GLOBAL)
 
 set_target_properties(unofficial-vcvrack::rack-sdk::lib PROPERTIES
-    VERSION @RACK_SDK_VERSION_MAJOR@.@RACK_SDK_VERSION_MINOR@.@RACK_SDK_VERSION_PATCH@
-    SOVERSION @RACK_SDK_VERSION_MAJOR@.@RACK_SDK_VERSION_MINOR@.@RACK_SDK_VERSION_PATCH@
+    VERSION "@RACK_SDK_VERSION_MAJOR@.@RACK_SDK_VERSION_MINOR@.@RACK_SDK_VERSION_PATCH@"
+    SOVERSION "@RACK_SDK_VERSION_MAJOR@.@RACK_SDK_VERSION_MINOR@.@RACK_SDK_VERSION_PATCH@"
     ENABLE_EXPORTS TRUE
     EXPORT_NO_SYSTEM TRUE
+    IMPORTED_NO_SYSTEM
     INTERFACE_COMPILE_FEATURES "cxx_std_11;c_std_11"
     INTERFACE_COMPILE_OPTIONS "-fPIC"
     INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
@@ -549,9 +600,9 @@ set_target_properties(unofficial-vcvrack::rack-sdk::lib PROPERTIES
     IMPORTED_IMPLIB "${_IMPORT_PREFIX}/@RACK_SDK_LIB_FILE_DESTINATION@/libRack${RACK_SDK_LIB_FILE_EXTENSION}"
     IMPORTED_NO_SONAME "TRUE"
     COMPATIBLE_INTERFACE_STRING "INTERFACE_lib_MAJOR_VERSION;INTERFACE_lib_MINOR_VERSION;INTERFACE_lib_PATCH_VERSION"
-    INTERFACE_lib_MAJOR_VERSION @RACK_SDK_VERSION_MAJOR@
-    INTERFACE_lib_MINOR_VERSION @RACK_SDK_VERSION_MINOR@
-    INTERFACE_lib_PATCH_VERSION @RACK_SDK_VERSION_PATCH@
+    INTERFACE_lib_MAJOR_VERSION "@RACK_SDK_VERSION_MAJOR@"
+    INTERFACE_lib_MINOR_VERSION "@RACK_SDK_VERSION_MINOR@"
+    INTERFACE_lib_PATCH_VERSION "@RACK_SDK_VERSION_PATCH@"
 )
 
 # Load information for each installed configuration.
@@ -627,7 +678,7 @@ cmake_policy(POP)
 
 list(APPEND RACK_SDK_TARGETS lib)
 
-endif(RACK_SDK_BUILD_LIB)
+endif(RACK_SDK_INSTALL_LIB)
 
 include(CMakePackageConfigHelpers)
 
