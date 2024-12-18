@@ -311,9 +311,9 @@ function(vcvrack_add_plugin)
     if(ARG_INSTALL)
         install(TARGETS plugin
             EXPORT PluginExports
-            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}" # root-level
+            RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}" # root-level
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
             INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
             FILE_SET plugin_plugin_PUBLIC_HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         )
