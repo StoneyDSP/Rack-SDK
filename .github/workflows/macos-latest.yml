@@ -39,7 +39,7 @@ jobs:
       run: |
         brew install git wget cmake autoconf automake libtool jq python zstd pkg-config sccache ninja tree
 
-    - name: Fetch Rack SDK
+    - name: Fetch Rack SDK (required)
       run: |
         mkdir dep
         curl https://vcvrack.com/downloads/Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip -o ./dep/Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip
@@ -47,15 +47,14 @@ jobs:
         unzip Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip
         cd ..
 
-      # DEVELOPER WORKFLOW
+    - name: Fetch Rack Executable (optional)
+      run: |
+        brew install --cask vcv-rack
 
-    - name: Configure
+    - name: Make
       env:
         RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
-      run: >-
-        cmake
-        --preset arm64-osx-release
-        --fresh
+      run: make workflow -j 3
 
     - name: Install
       run: >-
@@ -64,13 +63,6 @@ jobs:
         --prefix ${{ github.workspace }}/install
         --strip
         -j 3
-
-      # DEPLOYMENT WORKFLOW
-
-    - name: Package
-      env:
-        RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
-      run: make package -j 3
 
     # List all files in tree
     - name: List

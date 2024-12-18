@@ -77,7 +77,7 @@ jobs:
           tree
           ninja
 
-    - name: Fetch Rack SDK
+    - name: Fetch Rack SDK (required)
       shell: msys2 {0}
       run: |
         mkdir dep
@@ -86,16 +86,15 @@ jobs:
         unzip Rack-SDK-${{env.RACK_SDK_VERSION}}-${{env.RACK_SDK_PLATFORM}}.zip
         cd ..
 
-      # DEVELOPER WORKFLOW
+      # The below is a requirement for Windows (specifically, MinGW) *only*...
+    - name: Fetch Rack Executable (required)
+      run: winget install VCVRack.VCVRack --disable-interactivity --accept-source-agreements
 
-    - name: Configure
+    - name: Make
       shell: msys2 {0}
       env:
         RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
-      run: >-
-        cmake
-        --preset x64-windows-release
-        --fresh
+      run: make workflow -j 3
 
     - name: Install
       shell: msys2 {0}
@@ -105,14 +104,6 @@ jobs:
         --prefix ${PWD}/install
         --strip
         -j 3
-
-      # DEPLOYMENT WORKFLOW
-
-    - name: Package
-      shell: msys2 {0}
-      env:
-        RACK_DIR: ${{ github.workspace }}/dep/Rack-SDK
-      run: make package -j3
 
     # List all files in install tree
     - name: Tree
