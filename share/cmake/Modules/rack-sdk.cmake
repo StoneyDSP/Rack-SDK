@@ -311,6 +311,7 @@ function(vcvrack_add_plugin)
     if(ARG_INSTALL)
         install(TARGETS plugin
             EXPORT PluginExports
+            COMPONENT plugin
             LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}" # root-level
             RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}" # root-level
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
@@ -327,10 +328,12 @@ function(vcvrack_add_plugin)
     endif()
 
     if(ARG_EXPORT)
-        # export targets
+        # export: TARGETS ${name}
+        export(SETUP PluginExports)
         export(
-            TARGETS plugin
-            FILE "share/cmake/${_dir_prefix}/${_tgt_prefix}${slug}-plugin-targets.cmake"
+            # TARGETS plugin
+            EXPORT PluginExports
+            FILE "lib/cmake/${_dir_prefix}/${_tgt_prefix}${slug}-plugin-targets.cmake"
             NAMESPACE ${_ns_prefix}${slug}::
         )
     endif()
@@ -485,11 +488,13 @@ function(vcvrack_add_module name)
     if(ARG_INSTALL)
         install(TARGETS ${name}
             EXPORT ${name}Exports
+            COMPONENT ${name}
             LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
             ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
             RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
             INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
             FILE_SET plugin_${name}_PUBLIC_HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+            OPTIONAL
         )
 
         # install export set
@@ -501,10 +506,11 @@ function(vcvrack_add_module name)
     endif()
 
     if(ARG_EXPORT)
-        # export targets
+        # export: TARGETS ${name}
+        export(SETUP ${name}Exports)
         export(
-            TARGETS ${name}
-            FILE "share/cmake/${_dir_prefix}/${_tgt_prefix}${slug}-${name}-targets.cmake"
+            EXPORT ${name}Exports
+            FILE "lib/cmake/${_dir_prefix}/${_tgt_prefix}${slug}-${name}-targets.cmake"
             NAMESPACE ${_ns_prefix}${slug}::
         )
     endif()
@@ -959,7 +965,7 @@ vcvrack_add_module(MyOtherModule
 -- with the VCV Rack SDK and all its' dependencies.
 --
 -- For more examples:
--- https://github.com/StoneyDSP/StoneyVCV/dep/VCVRack/share/cmake/Modules/README.md
+-- https://github.com/StoneyDSP/Rack-SDK/share/cmake/Modules/README.md
 --
 ]==])
 
