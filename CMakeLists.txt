@@ -741,7 +741,7 @@ Name: Rack-SDK
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 Libs: -L${libdir}
-Cflags: -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack -fPIC
+Cflags: -I${includedir} -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack -fPIC
 ]==])
 
 # Configure pkgconfig file
