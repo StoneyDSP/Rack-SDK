@@ -20,8 +20,10 @@ set(RACK_VERSION ${RACK_SDK_VERSION_MAJOR}.${RACK_SDK_VERSION_MINOR}.${RACK_SDK_
 
 include(CMakeDependentOption)
 
-option(VCVRACK_DISABLE_USAGE_MESSAGE "" OFF)
+option(CPACK_STRIP_FILES "" ON)
+option(CPACK_SOURCE_STRIP_FILES "" ON)
 
+option(RACK_SDK_DISABLE_USAGE_MESSAGE "" OFF)
 option(RACK_SDK_INSTALL_DEPS "" ON)
 cmake_dependent_option(RACK_SDK_INSTALL_CORE "" ON "RACK_SDK_INSTALL_DEPS" ON)
 cmake_dependent_option(RACK_SDK_INSTALL_LIB "" ON "RACK_SDK_INSTALL_CORE" ON)
@@ -163,17 +165,12 @@ install(EXPORT DepExport
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Rack-SDK"
 )
 
+export(SETUP DepExport)
 export(
     EXPORT DepExport
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-dep-targets.cmake"
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-dep-targets.cmake"
     NAMESPACE unofficial-vcvrack::rack-sdk::
 )
-
-# export(
-# TARGETS dep
-# FILE "share/cmake/rack-sdk-dep-targets.cmake"
-# NAMESPACE unofficial-vcvrack::rack-sdk::
-# )
 
 list(APPEND RACK_SDK_TARGETS dep)
 
@@ -296,6 +293,7 @@ install(TARGETS core
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
     FILE_SET rack_sdk_CORE_INTERFACE_HEADERS DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/Rack-SDK/rack"
+    OPTIONAL
 )
 
 # generate and install export file
@@ -305,9 +303,10 @@ install(EXPORT CoreExport
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Rack-SDK"
 )
 
+export(SETUP CoreExport)
 export(
-    TARGETS core
-    FILE "share/cmake/rack-sdk-core-targets.cmake"
+    EXPORT CoreExport
+    FILE "lib/cmake/Rack-SDK/rack-sdk-core-targets.cmake"
     NAMESPACE unofficial-vcvrack::rack-sdk::
 )
 
@@ -379,9 +378,10 @@ list(APPEND RACK_SDK_TARGETS core)
 #     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Rack-SDK"
 # )
 
+# export(SETUP RackSDKExport)
 # export(
-#     TARGETS rack-sdk
-#     FILE "share/cmake/rack-sdk-targets.cmake"
+#     EXPORT RackSDKExport
+#     FILE "lib/cmake/Rack-SDK/rack-sdk-targets.cmake"
 #     NAMESPACE unofficial-vcvrack::
 # )
 
@@ -492,6 +492,7 @@ install(
 )
 
 if(RACK_SDK_INSTALL_RUNTIME_LIBS)
+    # Installs/symlinks lots of system libs... be warned
     install(
         RUNTIME_DEPENDENCY_SET LibExports
         COMPONENT runtimes
@@ -504,7 +505,7 @@ endif()
 
 # The below codeblob is a big multi-line string (not a comment!) which writes
 # information about the `lib` target to a file...
-file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-lib-targets.cmake" CONTENT [==[
+file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-lib-targets.cmake" CONTENT [==[
 if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.8)
     message(FATAL_ERROR "CMake >= 2.8.0 required")
 endif()
@@ -582,9 +583,9 @@ endif()
 
 if(WIN32)
     cmake_path(CONVERT "$ENV{ProgramFiles}\\VCV\\Rack2Free" TO_CMAKE_PATH_LIST dll_dir)
-    set(RACK_SDK_DLL_IMPORTED_LOCATION "${dll_dir}/libRack.dll")
+    set_and_check(RACK_SDK_DLL_IMPORTED_LOCATION "${dll_dir}/libRack.dll")
 else()
-    set(RACK_SDK_DLL_IMPORTED_LOCATION "${_IMPORT_PREFIX}/lib/libRack${RACK_SDK_LIB_FILE_EXTENSION}")
+    set_and_check(RACK_SDK_DLL_IMPORTED_LOCATION "${_IMPORT_PREFIX}/lib/libRack${RACK_SDK_LIB_FILE_EXTENSION}")
 endif()
 
 # Create imported target unofficial-vcvrack::rack-sdk::lib
@@ -722,7 +723,7 @@ message(STATUS "Imported module: unofficial-vcvrack::rack-sdk")
 
 ####################################################################################
 
-set(VCVRACK_DISABLE_USAGE_MESSAGE @VCVRACK_DISABLE_USAGE_MESSAGE@)
+set(RACK_SDK_DISABLE_USAGE_MESSAGE @RACK_SDK_DISABLE_USAGE_MESSAGE@)
 
 # Begin Rack SDK helper functions...
 @__RACK_SDK_HELPERS_FILE@
@@ -740,20 +741,20 @@ Name: Rack-SDK
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 Libs: -L${libdir}
-Cflags: -I${includedir} -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack -fPIC
+Cflags: -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack -fPIC
 ]==])
 
 # Configure pkgconfig file
 configure_file (
   "${CMAKE_CURRENT_BINARY_DIR}/Rack-SDK.pc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/share/pkgconfig/Rack-SDK.pc"
+  "${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/Rack-SDK.pc"
   @ONLY
 )
 
 # Install pkgconfig file
 install(
     FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/share/pkgconfig/Rack-SDK.pc"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/Rack-SDK.pc"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
 )
@@ -761,7 +762,7 @@ install(
 # create cmake config file
 configure_package_config_file(
     "${CMAKE_CURRENT_BINARY_DIR}/rack-sdk-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-config.cmake"
     INSTALL_DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/Rack-SDK"
 
@@ -771,17 +772,17 @@ configure_package_config_file(
 
 # generate the version file for the cmake config file
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-config-version.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-config-version.cmake"
     VERSION ${RACK_SDK_VERSION_MAJOR}.${RACK_SDK_VERSION_MINOR}.${RACK_SDK_VERSION_PATCH}
-    COMPATIBILITY AnyNewerVersion
+    COMPATIBILITY ExactVersion
 )
 
 # install config files
 install(
     FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-config-version.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/share/cmake/rack-sdk-lib-targets.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-config-version.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/Rack-SDK/rack-sdk-lib-targets.cmake"
     DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/cmake/Rack-SDK"
 )
@@ -791,30 +792,30 @@ if(RACK_SDK_IS_TOP_LEVEL)
     set(CPACK_PACKAGE_NAME "Rack-SDK")
     set(CPACK_PACKAGE_VENDOR "VCV")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CPack Component Installation Example")
-    set(CPACK_PACKAGE_VERSION "${RACK_SDK_VERSION_MAJOR}.${RACK_SDK_VERSION_MINOR}.${RACK_SDK_VERSION_PATCH}")
+    set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}")
     set(CPACK_PACKAGE_VERSION_MAJOR "${RACK_SDK_VERSION_MAJOR}")
     set(CPACK_PACKAGE_VERSION_MINOR "${RACK_SDK_VERSION_MINOR}")
     set(CPACK_PACKAGE_VERSION_PATCH "${RACK_SDK_VERSION_PATCH}")
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Rack-SDK")
-    set(CPACK_SOURCE_IGNORE_FILES)
+    set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Rack-SDK-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+    set(CPACK_PACKAGE_DIRECTORY "${CMAKE_INSTALL_PREFIX}")
+    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+    # set(CPACK_SOURCE_IGNORE_FILES)
+    set(CPACK_SOURCE_IGNORE_FILES "${CPACK_IGNORE_FILES}")
     list(APPEND CPACK_SOURCE_IGNORE_FILES
-        "/_CPack_Packages/"
+        "/CVS/;/\.svn/;/\.bzr/;/\.hg/;/\.git/;\.swp\$;\.#;/#"
         "/install/"
         "/build/"
         "/dist/"
         "/out/"
-        "/.git/"
-        "/.github/"
-        "/.vscode/"
-        "/*.zip"
-        "/*.tar"
-        "/*.tar.gz"
-        "/*.tar.xz"
-        "/*.tar.bz2"
-        "/*.tar.Z"
-        "/*.sh"
-        "/*.vcvplugin"
+        "/\.github/"
+        "/\.vscode/"
     )
+    # ${CPACK_PACKAGE_FILE_NAME}.${CPACK_PACKAGE_CHECKSUM}
+    # set(CPACK_OUTPUT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake")
+    # set(CPACK_SOURCE_OUTPUT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/CPackSourceConfig.cmake")
+    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}")
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-Source")
     # This must always be after all CPACK\_\* variables are defined
     include(CPack)
     cpack_add_component(dep
@@ -833,6 +834,12 @@ if(RACK_SDK_IS_TOP_LEVEL)
         DESCRIPTION "Dynamic library for Rack-SDK"
         GROUP "Rack-SDK"
         DEPENDS core
+    )
+    cpack_add_component(runtimes
+        DISPLAY_NAME "Shared Library Dependencies"
+        DESCRIPTION "Dynamic library Dependencies for Rack-SDK"
+        GROUP "Rack-SDK"
+        DEPENDS lib
     )
     # cpack_add_component(rack-sdk)
 endif()
