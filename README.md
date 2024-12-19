@@ -80,10 +80,10 @@ See [StoneyVCV](https://github.com/StoneyDSP/StoneyVCV/blob/production/CMakeList
 
 Download [VCV Rack](https://vcvrack.com/Rack) and the Rack SDK ([Windows x64](https://vcvrack.com/downloads/Rack-SDK-latest-win-x64.zip) / [Mac x64+ARM64](https://vcvrack.com/downloads/Rack-SDK-latest-mac-x64+arm64.zip) / [Linux x64](https://vcvrack.com/downloads/Rack-SDK-latest-lin-x64.zip)). Install VCV Rack, and unzip the SDK to any location on your local filesystem.
 
-Clone this project and move into the VCVRack SDK directory:
+Clone this project and move into the directory:
 
 ```shell
-git clone git@github.com:StoneyDSP/StoneyVCV.git && cd StoneyVCV/dep/VCVRack/Rack-SDK
+git clone git@github.com:StoneyDSP/Rack-SDK.git && cd Rack-SDK
 ```
 
 Configure CMake with a source directory (`-S`), a build directory (`-B`), and the `RACK_DIR` variable (`-DRACK_DIR=`).
@@ -161,7 +161,7 @@ As a further helper, we have also organized our `Makefile` to *automatically det
 make workflow
 ```
 
-*The above command will configure the plugin for the host machine's platform, perform any build steps, run tests, and then package the Rack SDK for further downstream processing; the chosen CPU and OS are detected by the Rack-SDK itself, while the common environment variables `VERBOSE` and `DEBUG` may also be set or unset, to further adapt the behaviour of `make configure` according to your current environment.*
+*The above command will configure the plugin for the host machine's platform, perform any build steps, run tests, and then package the Rack SDK for further downstream processing; the chosen CPU and OS are detected by the Rack-SDK itself, while the common environment variables `VERBOSE` and `DEBUG` may also be set or unset, to further adapt the behaviour of `make workflow` according to your current environment.*
 
 Further CMake actions and workflows can be triggered via `make` in a similarly environment-sensitive manner:
 
