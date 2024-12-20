@@ -933,7 +933,7 @@ function(vcvrack_add_link_options name)
 
 endfunction()
 
-if(NOT VCVRACK_DISABLE_USAGE_MESSAGE)
+if(NOT RACK_SDK_DISABLE_USAGE_MESSAGE)
 # Tell the user what to do...
 message(STATUS [==[
 --
