@@ -732,21 +732,6 @@ set(RACK_SDK_DISABLE_USAGE_MESSAGE @RACK_SDK_DISABLE_USAGE_MESSAGE@)
 ]==])
 
 # Create pkgconfig file
-get_target_property(linker_opts core
-    INTERFACE_LINK_OPTIONS
-)
-set(core_linker_opts)
-foreach(linker_opt IN LISTS linker_opts)
-    set(core_linker_opts "${linker_opt} ${core_linker_opts}")
-endforeach()
-
-get_target_property(compiler_opts core
-    INTERFACE_COMPILE_OPTIONS
-)
-set(core_compiler_opts)
-foreach(compiler_opt IN LISTS compiler_opts)
-    set(core_compiler_opts "${compiler_opt} ${core_compiler_opts}")
-endforeach()
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/Rack-SDK.pc.in" [==[
 prefix=@CMAKE_INSTALL_PREFIX@
@@ -757,8 +742,8 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 Name: Rack-SDK
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
-Libs: -L${libdir} @core_linker_opts@
-Cflags: -I${includedir} -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack @core_compiler_opts@
+Libs: -L${libdir}
+Cflags: -I${includedir} -I${includedir}/Rack-SDK/dep -I${includedir}/Rack-SDK/rack
 ]==])
 
 # Configure pkgconfig file
@@ -767,8 +752,6 @@ configure_file (
   "${CMAKE_CURRENT_BINARY_DIR}/lib/pkgconfig/Rack-SDK.pc"
   @ONLY
 )
-unset(core_linker_opts)
-unset(core_compiler_opts)
 
 # Install pkgconfig file
 install(
