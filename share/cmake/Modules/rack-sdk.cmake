@@ -398,13 +398,13 @@ function(vcvrack_add_module name)
     add_library(${slug}::${name} ALIAS ${name})
     if(DEFINED ARG_BRAND)
         add_library(${brand}::${slug}::${name} ALIAS ${name})
-    #     target_link_libraries(plugin PRIVATE ${brand}::${slug}::${name})
-    # else()
-    #     target_link_libraries(plugin PRIVATE ${slug}::${name})
+        target_link_libraries(plugin PRIVATE ${brand}::${slug}::${name})
+    else()
+        target_link_libraries(plugin PRIVATE ${slug}::${name})
     endif()
 
-    # either use the two 'target_link_libraries()' above, or use this:
-    vcvrack_add_sources(plugin PRIVATE $<TARGET_OBJECTS:${name}>)
+    ## either use the two 'target_link_libraries()' above, or use this:
+    # vcvrack_add_sources(plugin PRIVATE $<TARGET_OBJECTS:${name}>)
 
     target_link_libraries(${name}
         PUBLIC
