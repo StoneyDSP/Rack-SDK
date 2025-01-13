@@ -188,8 +188,8 @@ function(vcvrack_add_plugin)
     )
 
     # Minimum C/C++ language requirements
-    vcvrack_add_compile_features(plugin PUBLIC cxx_std_11)
-    vcvrack_add_compile_features(plugin PUBLIC c_std_11)
+    target_compile_features(plugin PUBLIC cxx_std_11)
+    target_compile_features(plugin PUBLIC c_std_11)
 
     # Generate dependency files alongside the object files
     vcvrack_add_compile_options(plugin PUBLIC "-MMD" "-MP")
