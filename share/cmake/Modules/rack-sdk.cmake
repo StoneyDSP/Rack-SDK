@@ -182,10 +182,34 @@ function(vcvrack_add_plugin)
         PUBLIC
         unofficial-vcvrack::rack-sdk::lib
     )
+    set_property(
+        TARGET plugin
+        PROPERTY "plugin_IS_VCVRACK_LIBRARY" TRUE # custom validation
+    )
 
     # Minimum C/C++ language requirements
-    target_compile_features(plugin PUBLIC cxx_std_11)
-    target_compile_features(plugin PUBLIC c_std_11)
+    vcvrack_add_compile_features(plugin PUBLIC cxx_std_11)
+    vcvrack_add_compile_features(plugin PUBLIC c_std_11)
+
+    # Generate dependency files alongside the object files
+    vcvrack_add_compile_options(plugin PUBLIC "-MMD" "-MP")
+    # Debugger symbols. These are removed with `strip`.
+    vcvrack_add_compile_options(plugin PUBLIC "-g")
+    # Optimization
+    vcvrack_add_compile_options(plugin PUBLIC "-O3" "-funsafe-math-optimizations" "-fno-omit-frame-pointer")
+    # Warnings
+    vcvrack_add_compile_options(plugin PUBLIC "-Wall" "-Wextra" "-Wno-unused-parameter")
+    if(UNIX)
+        if(APPLE)
+            vcvrack_add_compile_options(plugin PUBLIC "-stdlib=libc++")
+        else() # LINUX
+            vcvrack_add_compile_options(plugin PUBLIC "-Wsuggest-override")
+        endif()
+    endif()
+    if(WIN32)
+        vcvrack_add_compile_definitions(plugin PUBLIC "-D_USE_MATH_DEFINES")
+        vcvrack_add_compile_options(plugin PUBLIC "-municode" "-Wsuggest-override")
+    endif()
 
     set_target_properties(plugin
         PROPERTIES
@@ -195,11 +219,6 @@ function(vcvrack_add_plugin)
         ARCHIVE_OUTPUT_DIRECTORY "lib"
         LIBRARY_OUTPUT_DIRECTORY "lib"
         NO_SONAME TRUE
-    )
-
-    set_property(
-        TARGET plugin
-        PROPERTY "plugin_IS_VCVRACK_LIBRARY" TRUE # custom validation
     )
 
     if(DEFINED ARG_VERSION)
@@ -442,6 +461,26 @@ function(vcvrack_add_module name)
             PUBLIC
             "-D${name}_SOVERSION=${ARG_SOVERSION}"
         )
+    endif()
+
+    # Generate dependency files alongside the object files
+    vcvrack_add_compile_options(${name} PUBLIC "-MMD" "-MP")
+    # Debugger symbols. These are removed with `strip`.
+    vcvrack_add_compile_options(${name} PUBLIC "-g")
+    # Optimization
+    vcvrack_add_compile_options(${name} PUBLIC "-O3" "-funsafe-math-optimizations" "-fno-omit-frame-pointer")
+    # Warnings
+    vcvrack_add_compile_options(${name} PUBLIC "-Wall" "-Wextra" "-Wno-unused-parameter")
+    if(UNIX)
+        if(APPLE)
+            vcvrack_add_compile_options(${name} PUBLIC "-stdlib=libc++")
+        else() # LINUX
+            vcvrack_add_compile_options(${name} PUBLIC "-Wsuggest-override")
+        endif()
+    endif()
+    if(WIN32)
+        target_compile_definitions(${name} PUBLIC "-D_USE_MATH_DEFINES")
+        vcvrack_add_compile_options(${name} PUBLIC "-municode" "-Wsuggest-override")
     endif()
 
     vcvrack_add_compile_options(${name}
